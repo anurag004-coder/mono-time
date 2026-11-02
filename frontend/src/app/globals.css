@@ -1,0 +1,158 @@
+:root {
+  /* surfaces */
+  --bg:              #0F0E0C;   /* warm black */
+  --surface:         #171512;
+  --surface-2:       #1E1B17;
+  --hairline:        #2A2620;
+  --hairline-strong: #3A342B;
+
+  /* text */
+  --text:            #ECE6DA;   /* bone */
+  --text-muted:      #A39A8A;
+  --text-faint:      #6F675A;
+
+  /* accent: champagne metal (single brand accent) */
+  --champagne:       #D8C3A0;
+  --champagne-dim:   #B09C7A;
+  --on-champagne:    #1A150D;   /* text on champagne buttons */
+
+  /* semantic (small use only) */
+  --oxide:           #2E5E4E;   /* fills/borders for "in stock" */
+  --oxide-text:      #7FB29B;   /* readable text on dark */
+  --caution:         #D8C3A0;
+  --error:           #C2574B;
+
+  --radius:          4px;       /* small, almost square */
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  background-color: #0F0E0C;
+  color: #ECE6DA;
+  font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: #0F0E0C;
+  background-image: radial-gradient(circle at 50% 0%, rgba(216, 195, 160, 0.05) 0%, transparent 60%);
+  background-repeat: no-repeat;
+  color: #ECE6DA;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Tabular nums for all mono instances */
+.font-mono, [class*="font-mono"] {
+  font-family: 'DM Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Serif display type */
+.font-display, [class*="font-display"] {
+  font-family: 'Newsreader', Georgia, serif;
+}
+
+/* Accessible Focus States */
+:focus-visible {
+  outline: 2px solid #D8C3A0;
+  outline-offset: 2px;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: #D8C3A0;
+  color: #1A150D;
+  border-radius: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: background-color 180ms ease-out, transform 180ms ease-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #B09C7A;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid #3A342B;
+  color: #ECE6DA;
+  border-radius: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: border-color 180ms ease-out, color 180ms ease-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  border-color: #D8C3A0;
+}
+
+/* Signature Detail: Sweep animation for second-hand line */
+@keyframes sweepOnce {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.signature-sweep {
+  transform-origin: center center;
+  animation: sweepOnce 1.2s cubic-bezier(0.4, 0, 0.2, 1) 1;
+}
+
+.group:hover .signature-sweep-hover {
+  animation: sweepOnce 1.2s cubic-bezier(0.4, 0, 0.2, 1) 1;
+}
+
+/* Product Image Hover Zoom */
+.product-image-zoom {
+  transition: transform 400ms ease-out;
+}
+
+.group:hover .product-image-zoom {
+  transform: scale(1.03);
+}
+
+/* Prefers-reduced-motion: disable sweep and zoom */
+@media (prefers-reduced-motion: reduce) {
+  .signature-sweep,
+  .group:hover .signature-sweep-hover {
+    animation: none !important;
+  }
+  .product-image-zoom,
+  .group:hover .product-image-zoom {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Remove default scrollbar clutter where needed */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

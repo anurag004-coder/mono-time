@@ -1,0 +1,40 @@
+# Environment & Local Secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Next.js & Build Output
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+.vercel/
+
+# Databases & local state
+*.db
+*.sqlite3
+*.log
+.pytest_cache/
+
+# Binaries & Large Assets
+cloudflared.exe
+*.exe
+
+# Debugging Screenshots & temporary media
+screenshot*.png
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
