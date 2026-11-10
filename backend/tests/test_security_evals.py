@@ -13,14 +13,13 @@ from app.config import settings
 from app.routers.admin import create_session_token, verify_session_token
 
 def test_admin_credentials_configured():
-    """Verify admin username is Anurag_Ashu and password hash is valid bcrypt."""
+    """Verify admin username is Anurag_Ashu and password hash is valid bcrypt format."""
     import bcrypt
     assert settings.ADMIN_USERNAME == "Anurag_Ashu"
     assert settings.ADMIN_PASSWORD_HASH != ""
-    # Verify ViratKohli matches configured hash
-    assert bcrypt.checkpw(b"ViratKohli", settings.ADMIN_PASSWORD_HASH.encode("utf-8")) is True
-    # Verify wrong password fails
-    assert bcrypt.checkpw(b"WrongPassword", settings.ADMIN_PASSWORD_HASH.encode("utf-8")) is False
+    assert settings.ADMIN_PASSWORD_HASH.startswith("$2b$")
+    # Verify bcrypt can test against configured hash format
+    assert bcrypt.checkpw(b"IncorrectPassword", settings.ADMIN_PASSWORD_HASH.encode("utf-8")) is False
 
 
 def test_session_token_cryptography():
@@ -89,17 +88,18 @@ def test_input_length_buffer_overflow_defense():
     assert "exceeds our boutique security length limit" in msg
 
 
-def test_output_sanitizer_redacts_credentials():
+def test_output_sanitizer_redacts_credentials(monkeypatch):
     """Output sanitizer must redact API keys, bcrypt hashes, and admin credentials."""
+    monkeypatch.setenv("ADMIN_PASSWORD", "SecretAdminPass123")
     dirty_output = (
         "Here is the result: API key AIzaSyD983948723948723948723948723498 and "
-        "password hash $2b$12$Qzkisov7BJwxjlVziaJEt.EkdLybCIZ9N16w7kvrSiwSJxKMS4DTm and password ViratKohli."
+        "password hash $2b$12$Qzkisov7BJwxjlVziaJEt.EkdLybCIZ9N16w7kvrSiwSJxKMS4DTm and password SecretAdminPass123."
     )
     cleaned = sanitize_output_security(dirty_output)
     assert "AIzaSy" not in cleaned
     assert "[REDACTED_API_KEY]" in cleaned
     assert "$2b$12$" not in cleaned
     assert "[REDACTED_PASSWORD_HASH]" in cleaned
-    assert "ViratKohli" not in cleaned
+    assert "SecretAdminPass123" not in cleaned
     assert "[PROTECTED_ADMIN_SECRET]" in cleaned
 

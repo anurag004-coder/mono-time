@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "Anurag_Ashu")
     ADMIN_PASSWORD_HASH: str = os.getenv(
         "ADMIN_PASSWORD_HASH",
-        "$2b$12$Qzkisov7BJwxjlVziaJEt.EkdLybCIZ9N16w7kvrSiwSJxKMS4DTm",  # bcrypt hash for ViratKohli
+        "$2b$12$Qzkisov7BJwxjlVziaJEt.EkdLybCIZ9N16w7kvrSiwSJxKMS4DTm",
     )
     SESSION_SECRET: str = os.getenv(
         "SESSION_SECRET",

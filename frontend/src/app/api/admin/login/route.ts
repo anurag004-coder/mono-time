@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'Anurag_Ashu';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ViratKohli';
+// Irreversible SHA-256 hash (never store plaintext password in public source code)
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || 'f1e58d0186ad057d0b589a5231cdee6d3e48f8a365eb39900bd72f406e90a075';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'mono-time-atelier-secure-anurag-ashu-secret-key-2026-prod';
 
 function createSessionToken(username: string): string {
@@ -65,7 +66,8 @@ export async function POST(request: Request) {
 
     // Fallback: Standalone authentication for Vercel / serverless deployments
     const userMatch = username.toLowerCase() === ADMIN_USERNAME.toLowerCase();
-    const passMatch = password === ADMIN_PASSWORD;
+    const inputHash = crypto.createHash('sha256').update(password).digest('hex');
+    const passMatch = inputHash === ADMIN_PASSWORD_HASH;
 
     if (!userMatch || !passMatch) {
       return NextResponse.json(

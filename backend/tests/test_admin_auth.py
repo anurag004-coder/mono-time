@@ -36,12 +36,19 @@ def test_admin_login_failure_generic_message():
 
 
 def test_admin_login_success_anurag_ashu():
-    """Successful login with Anurag_Ashu / ViratKohli sets admin_session cookie."""
+    """Successful login with valid admin credentials sets admin_session cookie."""
     from app.routers.admin import failed_login_attempts
     failed_login_attempts.clear()
-    res = client.post("/api/admin/login", json={"username": "Anurag_Ashu", "password": "ViratKohli"})
-    assert res.status_code == 200
-    assert "admin_session" in res.cookies
+    test_pw = "AtelierTestSecret2026!"
+    hashed = bcrypt.hashpw(test_pw.encode(), bcrypt.gensalt()).decode()
+    orig_hash = settings.ADMIN_PASSWORD_HASH
+    try:
+        settings.ADMIN_PASSWORD_HASH = hashed
+        res = client.post("/api/admin/login", json={"username": "Anurag_Ashu", "password": test_pw})
+        assert res.status_code == 200
+        assert "admin_session" in res.cookies
+    finally:
+        settings.ADMIN_PASSWORD_HASH = orig_hash
 
 
 def test_admin_login_rate_limiting():

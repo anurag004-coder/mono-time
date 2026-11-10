@@ -1,3 +1,4 @@
+import os
 import re
 from typing import Tuple, Optional
 
@@ -28,7 +29,7 @@ ADVERSARIAL_INJECTION_PATTERNS = [
     
     # 4. Credential & secret harvesting
     r"(reveal|tell\s+me|show|give\s+me)\s+(the\s+)?(admin\s+password|api\s+key|gemini\s+key|database\s+password|secret\s+key|jwt\s+secret)",
-    r"\b(admin\s+password|api\s*key|viratkohli|anurag_ashu)\b",
+    r"\b(admin\s+password|api\s*key|access\s+token|secret\s+key)\b",
     r"(dump|show)\s+(all\s+)?(credit\s+cards?|orders?\s+database|customer\s+pii)",
 
     # 5. Injection & code execution vectors
@@ -98,6 +99,8 @@ def sanitize_output_security(output_text: str) -> str:
     sanitized = re.sub(r"\$2[aby]\$[0-9]{2}\$[A-Za-z0-9./]{53}", "[REDACTED_PASSWORD_HASH]", sanitized)
 
     # Redact raw admin password string if echoed
-    sanitized = re.sub(r"ViratKohli", "[PROTECTED_ADMIN_SECRET]", sanitized, flags=re.IGNORECASE)
+    admin_pass = os.getenv("ADMIN_PASSWORD", "")
+    if admin_pass:
+        sanitized = re.sub(re.escape(admin_pass), "[PROTECTED_ADMIN_SECRET]", sanitized, flags=re.IGNORECASE)
 
     return sanitized
