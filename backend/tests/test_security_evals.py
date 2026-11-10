@@ -102,3 +102,4 @@ def test_output_sanitizer_redacts_credentials():
     assert "[REDACTED_PASSWORD_HASH]" in cleaned
     assert "ViratKohli" not in cleaned
     assert "[PROTECTED_ADMIN_SECRET]" in cleaned
+

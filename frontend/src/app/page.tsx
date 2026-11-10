@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { ProductHero } from '@/components/ProductHero';
 import { WatchCollectionGrid } from '@/components/WatchCollectionGrid';
@@ -229,7 +230,13 @@ export default function StorefrontPage() {
           {/* Bottom Bar: small mono copyright */}
           <div className="pt-8 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-4 text-faint font-mono text-[11px]">
             <span>© 2026 Mono Time Timepieces. All rights reserved.</span>
-            <span>Haute Horology Atelier</span>
+            <Link
+              href="/admin"
+              className="hover:text-champagne transition-colors"
+              title="Atelier Administration Portal"
+            >
+              Haute Horology Atelier
+            </Link>
           </div>
         </div>
       </footer>
