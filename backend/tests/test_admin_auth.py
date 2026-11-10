@@ -35,6 +35,15 @@ def test_admin_login_failure_generic_message():
     assert res.json()["detail"] == "Invalid username or password."
 
 
+def test_admin_login_success_anurag_ashu():
+    """Successful login with Anurag_Ashu / ViratKohli sets admin_session cookie."""
+    from app.routers.admin import failed_login_attempts
+    failed_login_attempts.clear()
+    res = client.post("/api/admin/login", json={"username": "Anurag_Ashu", "password": "ViratKohli"})
+    assert res.status_code == 200
+    assert "admin_session" in res.cookies
+
+
 def test_admin_login_rate_limiting():
     """Rate limiting responds 429 after 5 failed attempts with retry delay."""
     from app.routers.admin import failed_login_attempts

@@ -26,9 +26,15 @@ class Settings(BaseSettings):
     DEFAULT_COUPON_CODE: str = "MONOTIME10"
 
     # Admin Authentication & Security
-    ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "admin")
-    ADMIN_PASSWORD_HASH: str = os.getenv("ADMIN_PASSWORD_HASH", "")
-    SESSION_SECRET: str = os.getenv("SESSION_SECRET", "")
+    ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "Anurag_Ashu")
+    ADMIN_PASSWORD_HASH: str = os.getenv(
+        "ADMIN_PASSWORD_HASH",
+        "$2b$12$Qzkisov7BJwxjlVziaJEt.EkdLybCIZ9N16w7kvrSiwSJxKMS4DTm",  # bcrypt hash for ViratKohli
+    )
+    SESSION_SECRET: str = os.getenv(
+        "SESSION_SECRET",
+        "mono-time-atelier-secure-anurag-ashu-secret-key-2026-prod",
+    )
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
 
     # Budget Shield & Cost Protection (Guarantees $0.00 bills on live links)

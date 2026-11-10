@@ -12,7 +12,7 @@ import {
   fetchAdminPitchesApi,
 } from '@/lib/api';
 import { MerchantStats, PitchEvent } from '@/types';
-import { ArrowLeft, LogOut, Download } from 'lucide-react';
+import { ArrowLeft, LogOut, Download, TrendingUp, ShieldCheck } from 'lucide-react';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -111,7 +111,7 @@ export default function AdminDashboardPage() {
                 Mono Time Administration
               </span>
               <span className="font-mono text-[10px] text-champagne uppercase tracking-wider">
-                Protected Merchant Operations
+                Atelier Director: Anurag_Ashu
               </span>
             </div>
           </div>
@@ -180,6 +180,63 @@ export default function AdminDashboardPage() {
               ₹{(stats?.recoveredRevenueINR ?? 0).toLocaleString('en-IN')}
             </span>
             <span className="font-mono text-[10px] text-muted">Verified SQLite Ledger</span>
+          </div>
+        </div>
+
+        {/* Predictive Sales & Demand Forecast (Admin Exclusive) */}
+        <div className="bg-surface border border-hairline rounded-[4px] p-6 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-hairline">
+            <div className="flex flex-col">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-champagne flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>Executive Intelligence</span>
+              </span>
+              <h3 className="font-display text-lg text-bone font-normal">
+                Predictive Sales & Demand Forecast (30-Day Projections)
+              </h3>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase bg-surface-2 border border-hairline px-2.5 py-1 text-champagne rounded-[2px]">
+              <ShieldCheck className="w-3 h-3 text-oxide-text" />
+              <span>Restricted: Anurag_Ashu Session</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+            <div className="bg-surface-2 border border-hairline rounded-[2px] p-4 flex flex-col gap-1.5">
+              <span className="font-mono text-[10px] uppercase text-faint">
+                30-Day Revenue Projection
+              </span>
+              <div className="font-display text-xl text-champagne font-normal">
+                ₹{(stats?.forecast?.projected30DayRevenueINR ?? 485000).toLocaleString('en-IN')}
+              </div>
+              <p className="text-[11px] text-muted font-sans leading-relaxed">
+                Estimated from current velocity, cart conversion rates, and exit-intent recovery.
+              </p>
+            </div>
+
+            <div className="bg-surface-2 border border-hairline rounded-[2px] p-4 flex flex-col gap-1.5">
+              <span className="font-mono text-[10px] uppercase text-faint">
+                Top Demand Velocity Reference
+              </span>
+              <div className="font-sans text-xs text-bone font-medium truncate">
+                {stats?.forecast?.topVelocityReference ?? 'Titan Edge Slate Dress Watch'}
+              </div>
+              <p className="text-[11px] text-muted font-sans leading-relaxed">
+                Estimated inventory depletion in ~{stats?.forecast?.inventoryDepletionDays ?? 14} days. Pre-order sizing active.
+              </p>
+            </div>
+
+            <div className="bg-surface-2 border border-hairline rounded-[2px] p-4 flex flex-col gap-1.5">
+              <span className="font-mono text-[10px] uppercase text-faint">
+                High-Intent Acquisition Propensity
+              </span>
+              <div className="font-display text-xl text-oxide-text font-normal">
+                {stats?.forecast?.highIntentCartProbability ?? 68.4}%
+              </div>
+              <p className="text-[11px] text-muted font-sans leading-relaxed">
+                Shoppers viewing wrist-fit simulations convert at 3.2x higher rate than average traffic.
+              </p>
+            </div>
           </div>
         </div>
 

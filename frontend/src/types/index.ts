@@ -82,6 +82,13 @@ export interface MerchantStats {
   recoveredRevenueINR: number;
   conversionRatePercent: number;
   ctrPercent: number;
+  forecast?: {
+    projected30DayRevenueINR: number;
+    expectedOrdersCount: number;
+    topVelocityReference: string;
+    inventoryDepletionDays: number;
+    highIntentCartProbability: number;
+  };
 }
 
 export type PaymentMethod = 'card' | 'upi' | 'cod';

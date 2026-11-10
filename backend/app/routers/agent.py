@@ -9,6 +9,7 @@ from app.schemas.pitch import ExitIntentCheckRequest, PitchClaimRequest
 from app.services.agent_graph import SupervisorAgent
 from app.services.observer_service import evaluate_exit_intent
 from app.services.rate_limiter import ip_rate_limiter, budget_shield
+from app.services.security_guardrails import inspect_input_security, sanitize_output_security
 
 router = APIRouter(prefix="", tags=["Autonomous Agents"])
 
@@ -46,6 +47,21 @@ def chat_with_agent(body: ChatMessageRequest, request: Request, db: Session = De
             confidence=1.0,
         )
 
+    # 2. Input Security Guardrail: Deflect Prompt Injections, Jailbreaks & Exfiltration
+    is_safe, deflection_msg = inspect_input_security(body.message)
+    if not is_safe:
+        return ChatMessageResponse(
+            id=f"sec-{int(time.time())}",
+            sender="agent",
+            agent_type="concierge",
+            text=deflection_msg or "Inquiry blocked by boutique security policy.",
+            timestamp=datetime.utcnow().strftime("%I:%M %p"),
+            attached_product=None,
+            suggested_prompts=["What watches look best on smaller wrists?", "Apply code MONOTIME10"],
+            sources=["Client Data & Security Protocol"],
+            confidence=1.0,
+        )
+
     result = SupervisorAgent.execute(
         db=db,
         user_message=body.message,
@@ -53,6 +69,12 @@ def chat_with_agent(body: ChatMessageRequest, request: Request, db: Session = De
         product_id=body.product_id,
         chat_history=body.chat_history,
     )
+    # 3. Output Sanitizer: Redact any accidental credential/key leakage
+    if isinstance(result, dict) and "text" in result:
+        result["text"] = sanitize_output_security(result["text"])
+    elif hasattr(result, "text"):
+        result.text = sanitize_output_security(result.text)
+
     return result
 
 @router.get("/agent/budget-status")
