@@ -135,3 +135,4 @@ When `GEMINI_API_KEY` is not provided or when the daily call cap is reached, the
 ## License
 
 This project is licensed under the MIT License.
+

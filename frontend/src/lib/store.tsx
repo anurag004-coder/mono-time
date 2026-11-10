@@ -409,10 +409,26 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       image: item.product.image,
     }));
 
+    // Intentional decline card check
+    const cardClean = (details?.cardNumber || '').replace(/[\s•]/g, '');
+    if (cardClean === '4000000000000002') {
+      return {
+        success: false,
+        orderId: '',
+        error: 'Your card was declined. Please use standard mock card 4242 4242 4242 4242.',
+      };
+    }
+
     let finalOrderId = `ORD-${Date.now().toString().slice(-6)}`;
-    let finalInvoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
+    let finalInvoiceNumber = `INV-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${finalOrderId.split('-').pop()}`;
     let finalPaymentMethod = details?.paymentMethod || 'card';
-    let finalPaymentDetails = {};
+    let finalPaymentDetails: any = {
+      method: finalPaymentMethod,
+      timestamp: new Date().toISOString(),
+      card_last4: (details?.cardNumber || '4242').slice(-4),
+      gateway: 'Stripe 3D-Secure Mock Sandbox',
+      transaction_ref: `ch_mock_${Math.random().toString(36).substring(2, 14)}`,
+    };
 
     // Call checkout confirmation API on backend to persist order in database
     try {
@@ -436,15 +452,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         finalOrderId = apiResult.orderId;
         finalInvoiceNumber = apiResult.invoiceNumber || finalInvoiceNumber;
         finalPaymentMethod = (apiResult.paymentMethod as PaymentMethod) || finalPaymentMethod;
-        finalPaymentDetails = apiResult.paymentDetails || {};
+        finalPaymentDetails = apiResult.paymentDetails || finalPaymentDetails;
       }
     } catch (err: any) {
-      console.warn('Backend order recording error:', err);
-      return {
-        success: false,
-        orderId: '',
-        error: err.message || 'Payment processing failed. Please try again.',
-      };
+      // Respect explicit rejection from backend (such as out-of-stock items or declined card)
+      if (err.message && (err.message.includes('declined') || err.message.includes('out of stock'))) {
+        return {
+          success: false,
+          orderId: '',
+          error: err.message,
+        };
+      }
+      // If backend is offline or on a serverless deployment without separate Python backend, complete simulation smoothly
+      console.warn('Backend order recording unavailable, completing in client simulation mode:', err);
     }
 
     clearCart();

@@ -129,8 +129,15 @@ def test_invoice_generation():
     assert inv["customer"]["name"] == "Vikram Seth"
 
 def test_toggle_product_stock():
-    # Toggle stock off then back on
-    res1 = client.post("/api/products/titan-edge-slate/toggle-stock")
+    from app.routers.admin import create_session_token
+    # Unauthenticated call must fail with 401
+    unauth_res = client.post("/api/products/titan-edge-slate/toggle-stock")
+    assert unauth_res.status_code == 401
+
+    admin_cookies = {"admin_session": create_session_token("admin")}
+
+    # Toggle stock off then back on with admin auth
+    res1 = client.post("/api/products/titan-edge-slate/toggle-stock", cookies=admin_cookies)
     assert res1.status_code == 200
     assert res1.json()["inStock"] is False
 
@@ -143,6 +150,6 @@ def test_toggle_product_stock():
     assert fail_res.status_code == 400
 
     # Toggle back on
-    res2 = client.post("/api/products/titan-edge-slate/toggle-stock")
+    res2 = client.post("/api/products/titan-edge-slate/toggle-stock", cookies=admin_cookies)
     assert res2.status_code == 200
     assert res2.json()["inStock"] is True

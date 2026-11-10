@@ -288,7 +288,10 @@ export async function confirmCheckoutApi(
     });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.detail || 'Payment verification failed');
+      if (res.status === 400) {
+        throw new Error(errData.detail || 'Transaction declined by payment provider.');
+      }
+      throw new Error(errData.detail || 'Backend payment gateway unreachable.');
     }
     return await res.json();
   } catch (err: any) {

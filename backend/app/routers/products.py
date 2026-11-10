@@ -6,6 +6,8 @@ from app.models.product import ProductModel
 from app.schemas.product import ProductResponse, ProductSearchRequest
 from app.services.rag_search import semantic_search_products
 
+from app.routers.admin import require_admin_auth
+
 router = APIRouter(prefix="/products", tags=["Products"])
 
 @router.get("", response_model=List[ProductResponse])
@@ -39,7 +41,11 @@ def search_products(body: ProductSearchRequest, db: Session = Depends(get_db)):
     )
 
 @router.post("/{product_id}/toggle-stock", response_model=ProductResponse)
-def toggle_stock(product_id: str, db: Session = Depends(get_db)):
+def toggle_stock(
+    product_id: str,
+    db: Session = Depends(get_db),
+    admin_user: str = Depends(require_admin_auth),
+):
     product = db.query(ProductModel).filter(ProductModel.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")

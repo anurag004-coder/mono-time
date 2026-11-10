@@ -1,5 +1,4 @@
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import Base, engine
@@ -21,14 +20,49 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# CORS Configuration for Next.js frontend and network/tunnel sharing
+# Pure ASGI Security Headers Middleware (lightweight, zero-deadlock)
+class SecurityHeadersMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+
+        async def send_wrapper(message):
+            if message.get("type") == "http.response.start":
+                headers = list(message.get("headers", []))
+                headers.extend([
+                    (b"x-content-type-options", b"nosniff"),
+                    (b"x-frame-options", b"SAMEORIGIN"),
+                    (b"x-xss-protection", b"1; mode=block"),
+                    (b"referrer-policy", b"strict-origin-when-cross-origin"),
+                    (b"permissions-policy", b"camera=(), microphone=(), geolocation=()"),
+                ])
+                message["headers"] = headers
+            await send(message)
+
+        await self.app(scope, receive, send_wrapper)
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Allowed CORS Origins (Never wildcard '.*' with credentials)
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://frontend-mu-seven-gmmp4fw1jh.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_origin_regex=r".*",
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"^https://frontend.*\.vercel\.app$",
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
 )
 
 # Mount API Routers
@@ -49,7 +83,6 @@ def root():
             "products": "/api/products",
             "chat": "/api/agent/chat",
             "observer": "/api/observer/check-exit-intent",
-            "merchant": "/api/merchant/analytics",
             "checkout": "/api/checkout/create-intent",
         },
     }
